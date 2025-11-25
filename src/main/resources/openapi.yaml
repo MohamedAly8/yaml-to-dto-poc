@@ -12,7 +12,7 @@ components:
         - name
       properties:
         itemId:
-          type: string # Now a simple String
+          type: string
           example: PROD-101-WKB
         name:
           type: string
@@ -48,7 +48,7 @@ components:
         - orderDate
       properties:
         orderId:
-          type: string # Now a simple String
+          type: string
           description: Unique order identifier
           example: ORD-990033
         customerEmail:
