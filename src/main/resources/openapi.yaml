@@ -5,16 +5,63 @@ info:
 paths: {}
 components:
   schemas:
-    User:
+    Item:
       type: object
+      required:
+        - itemId
+        - name
       properties:
-        id:
-          type: integer
-          format: int64
-          description: Unique ID of the user
-        username:
+        itemId:
+          type: string # Now a simple String
+          example: PROD-101-WKB
+        name:
           type: string
-          description: User's chosen username
-        active:
-          type: boolean
-          description: Account active status
+          description: Name of the product
+          example: Wireless Keyboard
+        price:
+          type: number
+          format: double
+          example: 85.00
+
+    # 2. Intermediate Nested Model (Contains Item)
+    LineItem:
+      type: object
+      required:
+        - quantity
+        - item
+      properties:
+        quantity:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
+        item:
+          $ref: '#/components/schemas/Item'
+          description: The simple item object being purchased
+
+    # 3. Main Composition Model (Contains Array of LineItem)
+    Order:
+      type: object
+      required:
+        - orderId
+        - items
+        - orderDate
+      properties:
+        orderId:
+          type: string # Now a simple String
+          description: Unique order identifier
+          example: ORD-990033
+        customerEmail:
+          type: string
+          format: email
+          example: user@example.com
+          description: Email of the purchasing customer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
+          description: List of items in the order
+        orderDate:
+          type: string
+          format: date-time
+          description: Timestamp of the order creation
