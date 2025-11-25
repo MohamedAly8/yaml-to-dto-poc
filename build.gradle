@@ -1,0 +1,91 @@
+plugins {
+    id 'java'
+    id 'org.openapi.generator' version '7.0.0'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+def generatedSourcesDir = "$buildDir/generated-src/openapi/main"
+
+dependencies {
+    def lombokVersion = '1.18.30'
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+    def jacksonVersion = '2.16.1'
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+
+    implementation "io.swagger.core.v3:swagger-annotations:2.2.22"
+
+
+    implementation "org.openapitools:jackson-databind-nullable:0.2.6"
+
+
+    implementation "jakarta.annotation:jakarta.annotation-api:2.1.1"
+    implementation "jakarta.validation:jakarta.validation-api:3.0.2"
+
+    implementation "org.springframework:spring-context:6.1.1"
+    implementation "org.springframework:spring-web:6.1.1"
+    implementation "jakarta.servlet:jakarta.servlet-api:6.0.0"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+}
+
+openApiGenerate {
+    inputSpec = "$rootDir/src/main/resources/openapi.yaml".toString()
+    outputDir = generatedSourcesDir.toString()
+
+    generatorName = "spring"
+
+    modelPackage = "com.example.model"
+    apiPackage = "com.example.api"
+
+    configOptions = [
+
+            interfaceOnly             : "true",
+            generateApi               : "false",
+            generateSupportingFiles   : "false",
+
+            useLombok                 : "true",
+            jackson                   : "true",
+            jacksonized               : "true",
+            useJakarta                : "true",
+            useSpringBoot3            : "true",
+            nullableOject             : "false",
+
+            additionalModelTypeAnnotations: "@lombok.Builder(setterPrefix = \"with\") @lombok.AllArgsConstructor"
+    ]
+
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "$generatedSourcesDir/src/main/java"
+        }
+    }
+    test {
+        java {
+            exclude "com/example/model/UserTest.java"
+            exclude "com/example/api/**"
+        }
+    }
+}
+
+
+compileJava.dependsOn tasks.openApiGenerate
+
+test {
+    useJUnitPlatform()
+}
